@@ -1,6 +1,7 @@
 {
   "routes": [
     { "route": "/", "rewrite": "/index.html" },
+    { "route": "/study", "rewrite": "/study/index.html" },
     { "route": "/about", "rewrite": "/about.html" },
     { "route": "/contact", "rewrite": "/contact.html" },
     { "route": "/privacy-policy", "rewrite": "/privacy-policy.html" },

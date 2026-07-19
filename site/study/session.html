@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<!-- KONTIO LABS — STUDY: flashcard session. Subdirectory depth (../ paths).
+     Opened as session.html?topic=<topic-id>. Space/Enter flips, 1–4 rates
+     (Again/Hard/Good/Easy). SM-2 scheduling via ../study/srs.js. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Session | Kontio Labs</title>
+<meta name="description" content="Flashcard review session — spaced repetition study from Kontio Labs.">
+<meta name="robots" content="noindex, follow">
+<link rel="canonical" href="https://kontiolabs.com/study/session.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="srs.css">
+<!-- Google Analytics 4 — replace G-XXXXXXXXXX with your Measurement ID -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-XXXXXXXXXX');</script>
+<script src="srs.js"></script>
+<script src="topics/manifest.js"></script>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<!-- ===== SHARED HEADER / NAV (../ paths) ===== -->
+<header><div class="header-inner">
+  <div><div class="site-title"><a href="../index.html">Kontio <span>Labs</span></a></div><div class="site-tagline">Independent apps for everyday life</div></div>
+  <nav><ul>
+      <li><a href="../index.html#apps">Apps</a></li>
+      <li><a href="index.html" aria-current="page">Study</a></li>
+      <li><a href="../about.html">About</a></li>
+      <li><a href="../contact.html" class="nav-cta">Contact</a></li>
+    </ul>
+  <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false"><svg class="icon-open" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </nav>
+</div></header>
+
+<div class="page-wrap full-width">
+  <main id="main-content">
+
+    <div class="breadcrumb"><a href="index.html">Study</a><span>›</span><span id="crumb-topic">Session</span></div>
+
+    <div id="storage-warning" class="srs-storage-warning" hidden>
+      <strong>Heads up:</strong> your browser is blocking local storage (private browsing?). You can still study, but progress won't be saved between visits.
+    </div>
+
+    <!-- Active session -->
+    <section id="session-view" hidden>
+      <div class="session-top">
+        <div class="session-topic-name" id="session-topic-name"></div>
+        <div class="session-count" id="session-count" aria-live="polite"></div>
+      </div>
+
+      <button type="button" id="flashcard" class="flashcard" aria-live="polite">
+        <span class="flashcard-side-label" id="card-side-label">Question</span>
+        <span class="flashcard-text" id="card-text"></span>
+        <span class="flashcard-hint" id="card-hint">Tap or press Space / Enter to flip</span>
+      </button>
+
+      <div class="rating-row" id="rating-row" hidden>
+        <button type="button" class="rating-btn again" data-rating="1">Again <small>&lt; 1 day</small><span class="rating-key">1</span></button>
+        <button type="button" class="rating-btn hard"  data-rating="2">Hard  <small id="hint-hard"></small><span class="rating-key">2</span></button>
+        <button type="button" class="rating-btn good"  data-rating="3">Good  <small id="hint-good"></small><span class="rating-key">3</span></button>
+        <button type="button" class="rating-btn easy"  data-rating="4">Easy  <small id="hint-easy"></small><span class="rating-key">4</span></button>
+      </div>
+    </section>
+
+    <!-- Nothing due -->
+    <section id="empty-view" hidden>
+      <div class="content-card">
+        <h2>You're all caught up 🎉</h2>
+        <p>No cards are due in this topic today. Come back when reviews are scheduled — or review the whole deck anyway (early reviews still update each card's schedule).</p>
+        <div class="btn-row">
+          <a href="index.html" class="cta-btn">← Back to topics</a>
+          <button type="button" id="review-anyway" class="cta-btn-outline">Review all cards anyway</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Session summary -->
+    <section id="summary-view" hidden>
+      <div class="content-card">
+        <h2>Session complete ✔</h2>
+        <div class="session-summary-stats">
+          <div><div class="summary-stat-val" id="sum-reviewed">0</div><div class="summary-stat-label">Reviews</div></div>
+          <div><div class="summary-stat-val" id="sum-correct">0%</div><div class="summary-stat-label">Correct (Good/Easy)</div></div>
+          <div><div class="summary-stat-val" id="sum-again">0</div><div class="summary-stat-label">Marked Again</div></div>
+        </div>
+        <h3>Next reviews due</h3>
+        <ul class="next-due-list" id="next-due-list"></ul>
+        <div class="btn-row" style="margin-top:16px;">
+          <a href="index.html" class="cta-btn">← Back to topics</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bad/missing topic id -->
+    <section id="error-view" hidden>
+      <div class="content-card">
+        <h2>Topic not found</h2>
+        <p>That topic doesn't exist (or its data file failed to load). Pick a topic from the study page.</p>
+        <a href="index.html" class="cta-btn">← Back to topics</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===== SHARED FOOTER (../ paths) ===== -->
+<footer>
+  <div class="footer-inner">
+    <div><h4><a href="../index.html">Kontio Labs</a></h4><p>Independent, privacy-first mobile apps for iOS and Android.</p><p style="margin-top:8px;font-size:0.78rem;color:rgba(255,255,255,0.35);">© 2026 Kontio Power, LLC</p></div>
+    <div><h4>Apps</h4><ul><li><a href="../index.html#apps">Financial Freedom</a></li><li><a href="../index.html#apps">All apps</a></li></ul></div>
+    <div><h4>Company</h4><ul><li><a href="../about.html">About</a></li><li><a href="../contact.html">Contact</a></li></ul></div>
+    <div><h4>Legal</h4><ul><li><a href="../privacy-policy.html">Privacy Policy</a></li><li><a href="../terms.html">Terms of Use</a></li></ul></div>
+  </div>
+  <div class="footer-bottom">© 2026 Kontio Power, LLC · Kontio Labs — built with care.</div>
+</footer>
+
+<script>(function(){var btn=document.querySelector('.nav-toggle'),nav=document.querySelector('header nav');if(btn&&nav){btn.addEventListener('click',function(){var o=nav.classList.toggle('open');btn.setAttribute('aria-expanded',o?'true':'false');});document.addEventListener('click',function(e){if(!e.target.closest('header')){nav.classList.remove('open');btn.setAttribute('aria-expanded','false');}})}})();</script>
+
+<script>
+(function () {
+  'use strict';
+
+  if (!SRS.storageAvailable) {
+    document.getElementById('storage-warning').hidden = false;
+  }
+
+  var views = {
+    session: document.getElementById('session-view'),
+    empty:   document.getElementById('empty-view'),
+    summary: document.getElementById('summary-view'),
+    error:   document.getElementById('error-view')
+  };
+  function show(name) {
+    Object.keys(views).forEach(function (k) { views[k].hidden = (k !== name); });
+  }
+
+  var flashcard  = document.getElementById('flashcard');
+  var sideLabel  = document.getElementById('card-side-label');
+  var cardText   = document.getElementById('card-text');
+  var cardHint   = document.getElementById('card-hint');
+  var ratingRow  = document.getElementById('rating-row');
+  var countLabel = document.getElementById('session-count');
+
+  var topic = null;
+  var queue = [];          /* cards left this session; "Again" cards requeue */
+  var current = null;
+  var flipped = false;
+  var stats = { reviewed: 0, correct: 0, again: 0 };
+  var reviewedIds = {};    /* distinct cards seen, for the summary's due list */
+
+  function startSession(cards) {
+    queue = cards.slice();
+    /* shuffle so the order varies between sessions */
+    for (var i = queue.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = queue[i]; queue[i] = queue[j]; queue[j] = t;
+    }
+    show('session');
+    nextCard();
+  }
+
+  function nextCard() {
+    if (!queue.length) { showSummary(); return; }
+    current = queue.shift();
+    flipped = false;
+    sideLabel.textContent = 'Question';
+    cardText.textContent = current.front;
+    cardHint.textContent = 'Tap or press Space / Enter to flip';
+    flashcard.classList.remove('is-back');
+    ratingRow.hidden = true;
+    countLabel.textContent = (queue.length + 1) + ' card' + (queue.length ? 's' : '') + ' left';
+    flashcard.focus();
+  }
+
+  function flip() {
+    if (flipped || !current) return;
+    flipped = true;
+    sideLabel.textContent = 'Answer';
+    cardText.textContent = current.back;
+    cardHint.textContent = 'How well did you remember? (1–4)';
+    flashcard.classList.add('is-back');
+    updateIntervalHints();
+    ratingRow.hidden = false;
+  }
+
+  /* Show what each rating would schedule, e.g. "4 days". */
+  function updateIntervalHints() {
+    var st = SRS.getCardState(topic.id, current.id);
+    function label(r) {
+      var d = SRS.review(st, r).interval;
+      return d === 1 ? '1 day' : d + ' days';
+    }
+    document.getElementById('hint-hard').textContent = label(2);
+    document.getElementById('hint-good').textContent = label(3);
+    document.getElementById('hint-easy').textContent = label(4);
+  }
+
+  function rate(rating) {
+    if (!flipped || !current) return;
+    var newState = SRS.review(SRS.getCardState(topic.id, current.id), rating);
+    SRS.setCardState(topic.id, current.id, newState);
+
+    stats.reviewed++;
+    if (rating >= 3) stats.correct++;
+    if (rating === 1) { stats.again++; queue.push(current); } /* see it again this session */
+    reviewedIds[current.id] = true;
+
+    nextCard();
+  }
+
+  function showSummary() {
+    document.getElementById('sum-reviewed').textContent = stats.reviewed;
+    document.getElementById('sum-correct').textContent =
+      stats.reviewed ? Math.round(stats.correct / stats.reviewed * 100) + '%' : '—';
+    document.getElementById('sum-again').textContent = stats.again;
+
+    /* group reviewed cards by their next due date */
+    var byDate = {};
+    Object.keys(reviewedIds).forEach(function (cardId) {
+      var st = SRS.getCardState(topic.id, cardId);
+      if (st) byDate[st.dueDate] = (byDate[st.dueDate] || 0) + 1;
+    });
+    var list = document.getElementById('next-due-list');
+    list.textContent = '';
+    Object.keys(byDate).sort().forEach(function (date) {
+      var li = document.createElement('li');
+      var strong = document.createElement('strong');
+      strong.textContent = date;
+      li.appendChild(strong);
+      li.appendChild(document.createTextNode(' — ' + byDate[date] + ' card' + (byDate[date] > 1 ? 's' : '')));
+      list.appendChild(li);
+    });
+    if (!Object.keys(byDate).length) {
+      var none = document.createElement('li');
+      none.textContent = 'No cards reviewed.';
+      list.appendChild(none);
+    }
+    show('summary');
+  }
+
+  /* --- events --- */
+  flashcard.addEventListener('click', flip);
+  Array.prototype.forEach.call(document.querySelectorAll('.rating-btn'), function (btn) {
+    btn.addEventListener('click', function () { rate(+btn.getAttribute('data-rating')); });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (views.session.hidden) return;
+    if (e.key === ' ' || e.key === 'Enter') {
+      /* let Enter/Space activate a focused rating button normally */
+      if (document.activeElement && document.activeElement.classList.contains('rating-btn')) return;
+      e.preventDefault();
+      flip();
+    } else if (['1', '2', '3', '4'].indexOf(e.key) !== -1) {
+      rate(+e.key);
+    }
+  });
+  document.getElementById('review-anyway').addEventListener('click', function () {
+    startSession(topic.cards);
+  });
+
+  /* --- boot --- */
+  SRS.loadTopics(function () {
+    var params = new URLSearchParams(window.location.search);
+    topic = SRS.getTopic(params.get('topic'));
+    if (!topic) { show('error'); return; }
+
+    document.getElementById('crumb-topic').textContent = topic.name;
+    document.getElementById('session-topic-name').textContent = topic.name;
+    document.title = topic.name + ' — Study Session | Kontio Labs';
+
+    var due = SRS.dueCards(topic);
+    if (due.length) startSession(due);
+    else show('empty');
+  });
+})();
+</script>
+</body>
+</html>
