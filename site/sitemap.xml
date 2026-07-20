@@ -5,6 +5,9 @@
   <url><loc>https://kontiolabs.com/study/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://kontiolabs.com/about.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://kontiolabs.com/contact.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://kontiolabs.com/blog.html</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://kontiolabs.com/video.html</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://kontiolabs.com/links.html</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
   <url><loc>https://kontiolabs.com/privacy-policy.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
   <url><loc>https://kontiolabs.com/terms.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
   <url><loc>https://kontiolabs.com/daily-companion-privacy.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>

@@ -539,7 +539,7 @@ footer {
 }
 .footer-inner {
   max-width: 1200px; margin: 0 auto; padding: 40px 20px 28px;
-  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 32px;
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 32px;
 }
 .footer-inner h4 { color: #fff; font-size: 0.88rem; font-weight: 700; margin-bottom: 12px; }
 .footer-inner a { color: rgba(255,255,255,0.6); text-decoration: none; }
