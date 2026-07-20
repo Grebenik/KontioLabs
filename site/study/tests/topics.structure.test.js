@@ -118,7 +118,8 @@ test('SRS.topicStats()/dueCards() run cleanly against every real topic (smoke te
 test('required expansion/new decks from the study-content plan are present', () => {
   const expectedIds = [
     'web-fundamentals', 'anthropic-architecture', 'ai-general', 'cybersecurity',
-    'networking', 'nist-csf', 'finnish-numbers', 'finnish-500-words', 'finnish-500-nouns'
+    'networking', 'network-security', 'nist-csf', 'finnish-numbers',
+    'finnish-500-words', 'finnish-500-nouns'
   ];
   const gotIds = new Set(topics.map((t) => t.id));
   expectedIds.forEach((id) => assert.ok(gotIds.has(id), 'expected topic "' + id + '" to be registered'));
@@ -127,6 +128,13 @@ test('required expansion/new decks from the study-content plan are present', () 
 test('web-fundamentals deck has close to the targeted ~100 cards', () => {
   const t = sandbox.SRS.getTopic('web-fundamentals');
   assert.ok(t.cards.length >= 90, 'expected roughly 100 cards, got ' + t.cards.length);
+});
+
+test('anthropic-architecture and network-security decks meet their certification-depth card targets', () => {
+  const aa = sandbox.SRS.getTopic('anthropic-architecture');
+  assert.ok(aa.cards.length >= 100, 'expected 100+ cards for exam-depth coverage, got ' + aa.cards.length);
+  const nsc = sandbox.SRS.getTopic('network-security');
+  assert.ok(nsc.cards.length >= 50, 'expected 50+ cards for exam-depth coverage, got ' + nsc.cards.length);
 });
 
 test('finnish-500-words and finnish-500-nouns decks each have close to the targeted 500 cards', () => {
