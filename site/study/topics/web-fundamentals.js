@@ -1,83 +1,109 @@
-/* Topic: Web Fundamentals — core HTML/CSS/JS concepts. */
+/* Topic: Web Fundamentals — core HTML/CSS/JS/HTTP concepts (100 cards).
+   Cards card-001..card-015 keep their original ids so saved progress carries over. */
 SRS.registerTopic({
   id: "web-fundamentals",
   name: "Web Fundamentals",
-  description: "Core HTML, CSS and JavaScript concepts every web developer should know cold.",
+  description: "HTML, CSS, JavaScript, HTTP and browser concepts every web developer should know cold.",
   cards: [
-    {
-      id: "card-001",
-      front: "What are the four layers of the CSS box model, from inside out?",
-      back: "Content → padding → border → margin. With box-sizing: border-box, the declared width/height includes content, padding and border (but never margin)."
-    },
-    {
-      id: "card-002",
-      front: "Rank these selectors by CSS specificity, highest first: .card, #main, div, style=\"...\"",
-      back: "Inline style → #main (ID) → .card (class) → div (element). Specificity is compared as (inline, IDs, classes/attributes/pseudo-classes, elements); !important overrides all of them."
-    },
-    {
-      id: "card-003",
-      front: "What is the JavaScript event loop?",
-      back: "The mechanism that lets single-threaded JS handle async work: the call stack runs synchronous code; completed async callbacks wait in task queues; when the stack is empty, the loop pushes the next task. Microtasks (promises) run before the next macrotask (setTimeout, I/O)."
-    },
-    {
-      id: "card-004",
-      front: "What is a closure in JavaScript?",
-      back: "A function that retains access to the variables of its enclosing scope even after that scope has finished executing. Used for private state, factories and callbacks that remember context."
-    },
-    {
-      id: "card-005",
-      front: "What are the three states of a JavaScript Promise?",
-      back: "Pending → fulfilled (resolved with a value) or rejected (with a reason). Once settled (fulfilled or rejected) the state can never change again."
-    },
-    {
-      id: "card-006",
-      front: "Why use semantic HTML elements (header, nav, main, article) instead of divs?",
-      back: "They convey meaning to browsers, screen readers and search engines: better accessibility (landmark navigation), better SEO, and more readable markup — with no visual cost, since styling is unchanged."
-    },
-    {
-      id: "card-007",
-      front: "In flexbox, what do justify-content and align-items control?",
-      back: "justify-content positions items along the main axis (row direction by default); align-items positions them along the cross axis. Change flex-direction and the two axes swap."
-    },
-    {
-      id: "card-008",
-      front: "When should you reach for CSS Grid instead of flexbox?",
-      back: "Grid for two-dimensional layout — rows AND columns controlled together (page layouts, card grids with strict alignment). Flexbox for one-dimensional flow along a single axis (toolbars, nav rows, centering)."
-    },
-    {
-      id: "card-009",
-      front: "What do the HTTP methods GET, POST, PUT, PATCH and DELETE conventionally do?",
-      back: "GET reads a resource (safe, cacheable). POST creates or triggers processing. PUT replaces a resource entirely. PATCH updates part of it. DELETE removes it. GET, PUT and DELETE are idempotent; POST is not."
-    },
-    {
-      id: "card-010",
-      front: "What makes an API 'RESTful'?",
-      back: "Resources identified by URLs, manipulated through standard HTTP methods, with stateless requests (each request carries all context) and representations (usually JSON). Server state changes are driven by the verbs, not by RPC-style endpoint names."
-    },
-    {
-      id: "card-011",
-      front: "What is the difference between let, const and var?",
-      back: "let and const are block-scoped and not attached to window; const also forbids reassignment (though object contents stay mutable). var is function-scoped, hoisted with undefined, and allows redeclaration — avoid it in modern code."
-    },
-    {
-      id: "card-012",
-      front: "What is event delegation and why use it?",
-      back: "Attaching one listener to a common ancestor and using event bubbling plus event.target to handle events from many children. Fewer listeners, and it automatically covers elements added later."
-    },
-    {
-      id: "card-013",
-      front: "What is the difference between == and === in JavaScript?",
-      back: "=== compares value and type with no coercion. == coerces operands to a common type first (so '1' == 1 is true), which causes surprising results — default to ===."
-    },
-    {
-      id: "card-014",
-      front: "What does 'mobile-first' CSS mean in practice?",
-      back: "Write base styles for the smallest screens, then layer on min-width media queries for larger screens. The default experience is the constrained one, so nothing essential depends on a big viewport."
-    },
-    {
-      id: "card-015",
-      front: "What is the difference between localStorage and sessionStorage?",
-      back: "Both store string key/value pairs per origin (~5MB, synchronous). localStorage persists until explicitly cleared; sessionStorage lives only as long as the tab. Neither is sent to the server (unlike cookies)."
-    }
+    { id: "card-001", front: "What are the four layers of the CSS box model, from inside out?", back: "Content → padding → border → margin. With box-sizing: border-box, the declared width/height includes content, padding and border (but never margin)." },
+    { id: "card-002", front: "Rank these selectors by CSS specificity, highest first: .card, #main, div, style=\"...\"", back: "Inline style → #main (ID) → .card (class) → div (element). Specificity is compared as (inline, IDs, classes/attributes/pseudo-classes, elements); !important overrides all of them." },
+    { id: "card-003", front: "What is the JavaScript event loop?", back: "The mechanism that lets single-threaded JS handle async work: the call stack runs synchronous code; completed async callbacks wait in task queues; when the stack is empty, the loop pushes the next task. Microtasks (promises) run before the next macrotask (setTimeout, I/O)." },
+    { id: "card-004", front: "What is a closure in JavaScript?", back: "A function that retains access to the variables of its enclosing scope even after that scope has finished executing. Used for private state, factories and callbacks that remember context." },
+    { id: "card-005", front: "What are the three states of a JavaScript Promise?", back: "Pending → fulfilled (resolved with a value) or rejected (with a reason). Once settled (fulfilled or rejected) the state can never change again." },
+    { id: "card-006", front: "Why use semantic HTML elements (header, nav, main, article) instead of divs?", back: "They convey meaning to browsers, screen readers and search engines: better accessibility (landmark navigation), better SEO, and more readable markup — with no visual cost, since styling is unchanged." },
+    { id: "card-007", front: "In flexbox, what do justify-content and align-items control?", back: "justify-content positions items along the main axis (row direction by default); align-items positions them along the cross axis. Change flex-direction and the two axes swap." },
+    { id: "card-008", front: "When should you reach for CSS Grid instead of flexbox?", back: "Grid for two-dimensional layout — rows AND columns controlled together (page layouts, card grids with strict alignment). Flexbox for one-dimensional flow along a single axis (toolbars, nav rows, centering)." },
+    { id: "card-009", front: "What do the HTTP methods GET, POST, PUT, PATCH and DELETE conventionally do?", back: "GET reads a resource (safe, cacheable). POST creates or triggers processing. PUT replaces a resource entirely. PATCH updates part of it. DELETE removes it. GET, PUT and DELETE are idempotent; POST is not." },
+    { id: "card-010", front: "What makes an API 'RESTful'?", back: "Resources identified by URLs, manipulated through standard HTTP methods, with stateless requests (each request carries all context) and representations (usually JSON). Server state changes are driven by the verbs, not by RPC-style endpoint names." },
+    { id: "card-011", front: "What is the difference between let, const and var?", back: "let and const are block-scoped and not attached to window; const also forbids reassignment (though object contents stay mutable). var is function-scoped, hoisted with undefined, and allows redeclaration — avoid it in modern code." },
+    { id: "card-012", front: "What is event delegation and why use it?", back: "Attaching one listener to a common ancestor and using event bubbling plus event.target to handle events from many children. Fewer listeners, and it automatically covers elements added later." },
+    { id: "card-013", front: "What is the difference between == and === in JavaScript?", back: "=== compares value and type with no coercion. == coerces operands to a common type first (so '1' == 1 is true), which causes surprising results — default to ===." },
+    { id: "card-014", front: "What does 'mobile-first' CSS mean in practice?", back: "Write base styles for the smallest screens, then layer on min-width media queries for larger screens. The default experience is the constrained one, so nothing essential depends on a big viewport." },
+    { id: "card-015", front: "What is the difference between localStorage and sessionStorage?", back: "Both store string key/value pairs per origin (~5MB, synchronous). localStorage persists until explicitly cleared; sessionStorage lives only as long as the tab. Neither is sent to the server (unlike cookies)." },
+    { id: "card-016", front: "What is hoisting in JavaScript?", back: "Declarations are processed before code runs: var declarations are hoisted and initialized to undefined; function declarations are hoisted with their body; let/const are hoisted but uninitialized (the 'temporal dead zone' — accessing them before the declaration throws)." },
+    { id: "card-017", front: "What determines the value of 'this' in a regular JavaScript function?", back: "How the function is called: obj.fn() → obj; bare fn() → undefined in strict mode (window otherwise); fn.call/apply/bind(x) → x; new Fn() → the new instance. Arrow functions ignore all of this and inherit 'this' lexically from the enclosing scope." },
+    { id: "card-018", front: "What is prototypal inheritance?", back: "Every object has an internal link to a prototype object; property lookups walk up this chain until found or the chain ends. class syntax is sugar over the same mechanism — methods live on the constructor's prototype." },
+    { id: "card-019", front: "What does async/await do under the hood?", back: "Syntax over promises: an async function always returns a promise, and await pauses the function (without blocking the thread) until the awaited promise settles, resuming with the value or throwing the rejection." },
+    { id: "card-020", front: "Difference between Promise.all, Promise.allSettled, Promise.race and Promise.any?", back: "all: resolves with every value, rejects on the first rejection. allSettled: always resolves with per-promise status objects. race: settles with whichever settles first (fulfil or reject). any: resolves with the first fulfilment, rejects only if all reject." },
+    { id: "card-021", front: "What are microtasks vs macrotasks?", back: "Microtasks (promise callbacks, queueMicrotask, MutationObserver) run to completion immediately after the current script, before rendering. Macrotasks (setTimeout, setInterval, I/O, events) run one per event-loop turn. The microtask queue is fully drained between macrotasks." },
+    { id: "card-022", front: "What do map, filter and reduce do on arrays?", back: "map transforms each element into a new array (same length). filter keeps elements passing a predicate. reduce folds the array into a single value using an accumulator. All are non-mutating." },
+    { id: "card-023", front: "What is the spread operator (...) used for?", back: "Expanding an iterable in place: copying/merging arrays ([...a, ...b]) and objects ({...obj, x: 1}), passing arrays as argument lists, and (as rest syntax) collecting remaining arguments or destructured values." },
+    { id: "card-024", front: "What is destructuring assignment?", back: "Syntax to unpack values from arrays or objects into variables: const {name, age = 30} = user; const [first, ...rest] = list. Supports defaults, renaming (name: n) and nesting." },
+    { id: "card-025", front: "Difference between null and undefined?", back: "undefined means 'no value was assigned' (missing property, unset variable, function with no return). null is an explicit 'intentionally empty' value a programmer assigns. typeof null is 'object' (a historical bug); null == undefined is true but null === undefined is false." },
+    { id: "card-026", front: "What are ES modules and how do they differ from CommonJS?", back: "ESM uses import/export, is statically analyzable (enables tree-shaking), loads asynchronously, and runs in strict mode. CommonJS (require/module.exports) is Node's older synchronous, dynamic system. Browsers load ESM via <script type=\"module\">." },
+    { id: "card-027", front: "What are Map and Set, and when do they beat plain objects/arrays?", back: "Map: key→value store with any key type, insertion order, and .size — better than objects for dynamic keys. Set: collection of unique values with O(1) has() — better than arrays for membership tests and de-duplication ([...new Set(arr)])." },
+    { id: "card-028", front: "What is JSON and what are its limitations?", back: "A text format for data exchange: objects, arrays, strings, numbers, booleans, null. No comments, no undefined, no functions, no Dates (serialized as strings), no circular references. JSON.stringify/parse convert to and from it." },
+    { id: "card-029", front: "What does 'use strict' change?", back: "Strict mode makes silent errors throw: assigning to undeclared variables, writing to read-only properties, duplicate parameter names. 'this' in bare function calls is undefined instead of window. Modules and class bodies are strict by default." },
+    { id: "card-030", front: "How do try/catch/finally and custom errors work in JS?", back: "try runs code, catch receives any thrown value, finally always runs (even after return). Throw Error subclasses (throw new TypeError('...')) rather than strings so you get stack traces and instanceof checks. Async errors need await or .catch()." },
+    { id: "card-031", front: "What is the DOM?", back: "The Document Object Model — the browser's live, tree-shaped object representation of the parsed HTML. JavaScript reads and mutates the page through it (querySelector, createElement, textContent, classList); changes trigger re-render." },
+    { id: "card-032", front: "textContent vs innerHTML — when is each appropriate?", back: "textContent sets plain text, escaping nothing because nothing is parsed — safe for untrusted data. innerHTML parses the string as HTML — convenient for trusted markup but an XSS vector if any part is user input." },
+    { id: "card-033", front: "What are the phases of DOM event propagation?", back: "Capturing (window down to the target), target, then bubbling (target back up to window). Listeners default to the bubble phase; pass {capture: true} to listen on the way down. stopPropagation() halts the journey; preventDefault() cancels the default action only." },
+    { id: "card-034", front: "How does the fetch API report HTTP errors?", back: "fetch only rejects on network failure. HTTP errors (404, 500) resolve normally with response.ok === false — you must check response.ok or response.status yourself before calling response.json()." },
+    { id: "card-035", front: "What is debouncing vs throttling?", back: "Debounce: run the function only after events stop for N ms (search-as-you-type). Throttle: run at most once every N ms while events continue (scroll handlers). Both cut down handler executions for bursty events." },
+    { id: "card-036", front: "What is CORS and why does it exist?", back: "Cross-Origin Resource Sharing: servers opt in to cross-origin browser requests via Access-Control-Allow-Origin (and friends). It relaxes the same-origin policy, which otherwise blocks scripts from reading responses fetched from other origins. Preflight OPTIONS requests check non-simple requests first." },
+    { id: "card-037", front: "What is the same-origin policy?", back: "The browser security rule that scripts may only read data from pages/requests sharing the same scheme + host + port. It prevents a malicious site from reading your banking API responses using your logged-in cookies." },
+    { id: "card-038", front: "What is XSS and the primary defense against it?", back: "Cross-Site Scripting — injecting attacker-controlled script into a page other users view. Defend by treating all user input as text: escape output for its context, use textContent over innerHTML, sanitize rich HTML, and set a Content-Security-Policy." },
+    { id: "card-039", front: "What is CSRF and how is it prevented?", back: "Cross-Site Request Forgery — a malicious site triggers a state-changing request using the victim's ambient cookies. Defenses: SameSite cookies (Lax/Strict), anti-CSRF tokens the attacker can't read, and requiring re-auth for sensitive actions." },
+    { id: "card-040", front: "What do common HTTP status code classes mean, with examples?", back: "1xx informational; 2xx success (200 OK, 201 Created, 204 No Content); 3xx redirection (301 permanent, 302 temporary, 304 Not Modified); 4xx client error (400, 401 unauthenticated, 403 forbidden, 404, 429 rate-limited); 5xx server error (500, 502, 503)." },
+    { id: "card-041", front: "401 Unauthorized vs 403 Forbidden?", back: "401: the request lacks valid authentication — who are you? (Send credentials / log in.) 403: you are authenticated but not allowed to do this — the server knows who you are and still refuses." },
+    { id: "card-042", front: "What are HTTP headers? Name common request and response headers.", back: "Key-value metadata on requests/responses. Request: Host, Authorization, Accept, Content-Type, Cookie, User-Agent. Response: Content-Type, Set-Cookie, Cache-Control, ETag, Location, Access-Control-Allow-Origin." },
+    { id: "card-043", front: "How do cookies work, and what do Secure, HttpOnly and SameSite do?", back: "Set-Cookie stores small key-value pairs the browser re-sends to that origin. Secure: only over HTTPS. HttpOnly: invisible to JavaScript (blunts XSS token theft). SameSite Lax/Strict: withheld on cross-site requests (blunts CSRF)." },
+    { id: "card-044", front: "How does HTTP caching with Cache-Control and ETag work?", back: "Cache-Control: max-age lets the browser reuse a response without asking. After expiry, the browser revalidates with If-None-Match: <etag>; the server answers 304 Not Modified (use your copy) or 200 with new content. no-store disables caching entirely." },
+    { id: "card-045", front: "What happens during a TLS/HTTPS connection setup, at a high level?", back: "The client and server negotiate cipher suites, the server proves identity with a certificate chained to a trusted CA, and both sides derive shared symmetric keys (key exchange). All subsequent traffic is encrypted and integrity-protected." },
+    { id: "card-046", front: "What does the browser do between typing a URL and rendering the page?", back: "DNS lookup → TCP (+TLS) connect → HTTP request → parse HTML into DOM, CSS into CSSOM → build render tree → layout (positions/sizes) → paint → composite. Blocking scripts and stylesheets can pause parsing/rendering along the way." },
+    { id: "card-047", front: "What is reflow (layout) vs repaint, and why care?", back: "Reflow recomputes element geometry (triggered by size/position/font changes); repaint redraws pixels without geometry changes (color changes). Reflows are expensive and can cascade — batch DOM reads/writes and prefer transform/opacity animations, which skip both." },
+    { id: "card-048", front: "async vs defer on a <script> tag?", back: "Both download without blocking parsing. async executes as soon as it arrives (order not guaranteed) — good for independent scripts like analytics. defer executes after parsing finishes, in document order — good for scripts that need the DOM." },
+    { id: "card-049", front: "What are CSS custom properties (variables)?", back: "Author-defined values declared as --name: value (usually on :root) and read with var(--name, fallback). They cascade and inherit like normal properties, can be changed at runtime or per-media-query, and power theming without preprocessors." },
+    { id: "card-050", front: "Explain the CSS position values: static, relative, absolute, fixed, sticky.", back: "static: normal flow (default). relative: normal flow but offsettable; becomes a positioning ancestor. absolute: removed from flow, positioned against the nearest positioned ancestor. fixed: positioned against the viewport. sticky: flows until a scroll threshold, then pins." },
+    { id: "card-051", front: "How do z-index and stacking contexts work?", back: "z-index orders positioned elements within their stacking context. New contexts are created by positioned elements with z-index, opacity < 1, transform, filter, etc. Children can never escape their parent's context — the classic reason a huge z-index 'doesn't work'." },
+    { id: "card-052", front: "Give the common CSS units and when to use each: px, em, rem, %, vw/vh.", back: "px: fixed; fine for borders/shadows. rem: relative to root font size — best default for type and spacing (respects user settings). em: relative to the element's own font size — good for padding that scales with text. %: relative to parent. vw/vh: relative to viewport." },
+    { id: "card-053", front: "What is the CSS cascade — how is the winning declaration chosen?", back: "In order: origin and importance (user-agent < user < author; !important reverses) → cascade layers → specificity → source order (later wins). Inheritance only applies when nothing sets the property directly." },
+    { id: "card-054", front: "Difference between CSS transitions and animations?", back: "Transitions interpolate between two states when a property changes (hover, class toggle) — declared with transition: prop duration easing. Animations run keyframe sequences (@keyframes) independently of state changes, can loop, alternate and pause." },
+    { id: "card-055", front: "What are pseudo-classes vs pseudo-elements?", back: "Pseudo-classes (single colon) select existing elements in a state: :hover, :focus, :nth-child, :not. Pseudo-elements (double colon) style generated sub-parts: ::before, ::after (require content), ::first-line, ::placeholder." },
+    { id: "card-056", front: "What is a media query and what features can it test?", back: "@media applies CSS conditionally: viewport width/height (min-width), orientation, resolution, pointer accuracy, and user preferences like prefers-color-scheme (dark mode) and prefers-reduced-motion." },
+    { id: "card-057", front: "How does margin collapsing work?", back: "Adjacent vertical margins of block elements merge into one margin equal to the larger value — between siblings, and between a parent and its first/last child when nothing (border, padding, content) separates them. Flex/grid children never collapse." },
+    { id: "card-058", front: "What is the difference between display: none, visibility: hidden, and opacity: 0?", back: "display:none removes the element from layout and the accessibility tree. visibility:hidden keeps its space but hides it (and from AT). opacity:0 keeps space AND keeps it interactive/focusable — often a bug source." },
+    { id: "card-059", front: "What are ARIA attributes and the first rule of ARIA?", back: "aria-* attributes add accessibility semantics (roles, states, labels) to elements. First rule: don't use ARIA if a native element does the job — a real <button> beats <div role=\"button\"> because it's focusable and keyboard-operable for free." },
+    { id: "card-060", front: "What makes an image accessible, and when should alt be empty?", back: "A concise alt describing the image's function/content. alt=\"\" (empty, not missing) for purely decorative images so screen readers skip them. Complex charts need a nearby text alternative." },
+    { id: "card-061", front: "Name key ingredients of keyboard accessibility.", back: "Everything interactive reachable by Tab in a logical order; visible focus styles (:focus-visible); Enter/Space activate controls; Escape closes overlays; no keyboard traps; skip links to bypass repeated navigation." },
+    { id: "card-062", front: "What do <label>, fieldset and autocomplete contribute to forms?", back: "<label for=\"id\"> ties text to a control (click target + screen reader announcement). <fieldset>/<legend> group related controls. autocomplete hints (email, name, postal-code) enable browser autofill. Native validation: required, type, pattern, min/max." },
+    { id: "card-063", front: "GET vs POST for form submission?", back: "GET puts data in the URL query string — bookmarkable, cacheable, size-limited; use for searches/filters. POST sends data in the body — not cached or logged in URLs; required for state changes, credentials and uploads." },
+    { id: "card-064", front: "What is responsive images markup — srcset and sizes?", back: "srcset lists image candidates with widths (image-800.jpg 800w); sizes tells the browser the rendered slot width per breakpoint. The browser picks the best file for viewport and pixel density. <picture> adds art direction and format fallbacks (AVIF/WebP)." },
+    { id: "card-065", front: "What is lazy loading and how do you do it natively?", back: "Deferring loading of below-the-fold assets until needed: <img loading=\"lazy\">, <iframe loading=\"lazy\">. For arbitrary content use IntersectionObserver. Never lazy-load above-the-fold/LCP images." },
+    { id: "card-066", front: "What are the Core Web Vitals?", back: "LCP (Largest Contentful Paint, loading — good < 2.5s), INP (Interaction to Next Paint, responsiveness — good < 200ms), CLS (Cumulative Layout Shift, visual stability — good < 0.1). Google uses them as ranking signals." },
+    { id: "card-067", front: "Name common ways to shrink frontend payloads.", back: "Minify + compress (gzip/brotli), tree-shake and code-split JS, serve modern image formats sized correctly, subset fonts (font-display: swap), cache with long max-age + hashed filenames, and use a CDN." },
+    { id: "card-068", front: "What is a Service Worker?", back: "A background script that proxies network requests for your origin, enabling offline caching (Cache API), push notifications and background sync. It runs off the main thread, requires HTTPS, and is the core of PWAs." },
+    { id: "card-069", front: "What is a Progressive Web App (PWA)?", back: "A web app that's installable and offline-capable: a manifest (name, icons, display mode), a service worker for caching, and HTTPS. It gets an app icon and standalone window while remaining a URL." },
+    { id: "card-070", front: "What are WebSockets, and how do they differ from HTTP polling and SSE?", back: "WebSockets upgrade an HTTP connection to a persistent, full-duplex channel — both sides push messages anytime (chat, games). SSE is one-way server→client over plain HTTP. Polling repeatedly asks the server — simplest but wasteful." },
+    { id: "card-071", front: "What is JSON Web Token (JWT) auth in a nutshell, and one caveat?", back: "The server signs a token containing claims (user id, expiry); the client sends it with each request (Authorization: Bearer); the server verifies the signature statelessly. Caveats: tokens can't be revoked before expiry without extra state, and the payload is only base64-encoded — readable, not secret." },
+    { id: "card-072", front: "What is the difference between authentication and authorization?", back: "Authentication verifies who you are (login, tokens, MFA). Authorization decides what you may do (roles, permissions, ownership checks). A request can be authenticated yet unauthorized → 403." },
+    { id: "card-073", front: "What is DNS's role when loading a website?", back: "It resolves the human-readable hostname to an IP address via a chain of caches and servers (browser/OS cache → resolver → root → TLD → authoritative). Slow or repeated lookups add latency; dns-prefetch/preconnect hints can hide it." },
+    { id: "card-074", front: "What improved in HTTP/2 and HTTP/3 over HTTP/1.1?", back: "HTTP/2: one TCP connection multiplexes many streams (no head-of-line queuing at the HTTP layer), header compression, prioritization. HTTP/3 runs on QUIC over UDP — removes TCP head-of-line blocking and speeds up handshakes." },
+    { id: "card-075", front: "What is graceful degradation vs progressive enhancement?", back: "Progressive enhancement: build a working baseline (HTML, core function), then layer on CSS/JS niceties for capable browsers. Graceful degradation: build the full experience, then patch fallbacks. Enhancement-first is the more robust mindset." },
+    { id: "card-076", front: "What is the difference between a shallow copy and deep copy of an object?", back: "Shallow copy ({...obj}, Object.assign) duplicates only the top level — nested objects are still shared references. Deep copy duplicates the whole tree: structuredClone(obj) natively, or JSON.parse(JSON.stringify(x)) with caveats (loses Dates, functions, undefined)." },
+    { id: "card-077", front: "Why is 0.1 + 0.2 !== 0.3 in JavaScript?", back: "Numbers are IEEE-754 double-precision floats; 0.1 and 0.2 have no exact binary representation, so the sum is 0.30000000000000004. Compare with a tolerance (Math.abs(a-b) < Number.EPSILON) or work in integer cents." },
+    { id: "card-078", front: "What are truthy and falsy values in JavaScript?", back: "Falsy: false, 0, -0, 0n, '', null, undefined, NaN. Everything else is truthy — including '0', 'false', [], and {}. This is why if ([]) runs, and why explicit checks beat relying on coercion." },
+    { id: "card-079", front: "What is optional chaining (?.) and nullish coalescing (??)?", back: "a?.b returns undefined instead of throwing when a is null/undefined; works for calls (fn?.()) and indexes (arr?.[0]). x ?? y returns y only when x is null/undefined — unlike ||, it keeps 0, '' and false." },
+    { id: "card-080", front: "What does Array.prototype.sort do by default, and how do you sort numbers?", back: "It sorts in place by converting elements to strings — so [10, 2, 1] becomes [1, 10, 2]. Pass a comparator: arr.sort((a, b) => a - b). Use toSorted() for a non-mutating version." },
+    { id: "card-081", front: "What is the difference between synchronous and asynchronous code in the browser?", back: "Sync code blocks the single main thread — long loops freeze rendering and input. Async APIs (timers, fetch, events) hand work to the browser and queue callbacks for later turns of the event loop, keeping the UI responsive." },
+    { id: "card-082", front: "What are Web Workers?", back: "Scripts running on background threads, communicating with the page via postMessage (structured-clone data, no DOM access). Use them for CPU-heavy work (parsing, image processing) so the main thread stays smooth." },
+    { id: "card-083", front: "How do you avoid layout thrashing when manipulating the DOM?", back: "Batch reads before writes: reading offsetHeight after a style write forces a synchronous reflow. Collect measurements first, then apply changes; use requestAnimationFrame for visual updates; build fragments off-DOM and insert once." },
+    { id: "card-084", front: "What is requestAnimationFrame for?", back: "Scheduling a callback right before the next repaint (~60fps, paused in background tabs). The correct way to drive JS animations and visual updates — smoother and more efficient than setInterval." },
+    { id: "card-085", front: "What is tree shaking?", back: "Dead-code elimination during bundling: because ES module imports/exports are static, the bundler can prove which exports are unused and drop them, shrinking the shipped JavaScript." },
+    { id: "card-086", front: "What is a source map?", back: "A file mapping minified/transpiled output back to original source, so DevTools show real filenames, line numbers and variables when debugging production code. Served as .map files referenced by a sourceMappingURL comment." },
+    { id: "card-087", front: "What is semantic versioning (semver)?", back: "MAJOR.MINOR.PATCH — major: breaking changes; minor: backwards-compatible features; patch: bug fixes. npm ranges: ^1.2.3 allows minor+patch updates; ~1.2.3 allows patch only. Lockfiles pin exact resolved versions." },
+    { id: "card-088", front: "What is the difference between dependencies and devDependencies in package.json?", back: "dependencies are needed at runtime by consumers of the package/app; devDependencies are build/test-time only (bundlers, linters, test runners) and are skipped when your package is installed as someone else's dependency." },
+    { id: "card-089", front: "What is Content-Security-Policy (CSP)?", back: "A response header whitelisting where scripts, styles, images and connections may load from (script-src 'self'). It blocks inline script injection by default, making CSP one of the strongest XSS mitigations." },
+    { id: "card-090", front: "What is the viewport meta tag and why is it required for responsive design?", back: "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"> tells mobile browsers to use the device width instead of emulating a ~980px desktop viewport. Without it, media queries and rem sizing behave as if on desktop." },
+    { id: "card-091", front: "What is the difference between inline, block and inline-block display?", back: "block: starts on a new line, fills available width, accepts width/height. inline: flows within text, ignores width/height and vertical margins. inline-block: flows inline but accepts box dimensions." },
+    { id: "card-092", front: "What are data-* attributes for?", back: "Storing custom data on elements validly: <li data-user-id=\"42\">. Read via element.dataset.userId or CSS attribute selectors. Good for small UI state hooks; not a substitute for real state management or accessibility semantics." },
+    { id: "card-093", front: "What does encodeURIComponent do and when do you need it?", back: "It percent-encodes a string so it's safe inside a URL component — escaping &, =, ?, /, spaces, unicode. Use it for every dynamic query-string value; URLSearchParams does it for you." },
+    { id: "card-094", front: "What is the difference between throttling network vs CPU in DevTools, and why test both?", back: "Network throttling simulates slow connections (payload and latency problems); CPU throttling simulates weaker devices (script and rendering cost). A page can pass one and fail the other — low-end mobile suffers both at once." },
+    { id: "card-095", front: "What are the ways to center a div, in modern CSS?", back: "Flexbox: display:flex; justify-content:center; align-items:center on the parent. Grid: display:grid; place-items:center. Margin: margin-inline:auto for horizontal block centering. position+transform is the legacy fallback." },
+    { id: "card-096", front: "What is :focus-visible and why prefer it over :focus?", back: ":focus-visible matches only when the browser judges focus should be visible (keyboard navigation), not on mouse clicks — letting you keep strong focus rings for keyboard users without the 'ugly outline on click' complaint that leads people to remove outlines entirely." },
+    { id: "card-097", front: "How does the browser decide when DOMContentLoaded vs load fire?", back: "DOMContentLoaded: HTML fully parsed and deferred scripts run — images/styles may still be loading. load: all resources (images, stylesheets, iframes) finished. Modern code with defer rarely needs either; scripts at end of body run after parsing anyway." },
+    { id: "card-098", front: "What is idempotency in HTTP and why does it matter?", back: "An idempotent request has the same effect whether sent once or many times (GET, PUT, DELETE). It makes retries safe — clients and proxies can re-send after timeouts. POST isn't idempotent, which is why payment APIs use idempotency keys." },
+    { id: "card-099", front: "What are the robots.txt file and sitemap.xml for?", back: "robots.txt tells crawlers which paths they may fetch (advisory, not security). sitemap.xml lists canonical URLs with hints (lastmod, priority) to help search engines discover and prioritize pages." },
+    { id: "card-100", front: "What are meta description, canonical link and Open Graph tags for?", back: "meta description: the snippet search engines may show (CTR, not ranking). rel=canonical: declares the preferred URL among duplicates. Open Graph (og:*): controls title/image/description when the page is shared on social platforms." }
   ]
 });

@@ -3,5 +3,13 @@
    topic file in study/topics/ and add one line here. */
 SRS.manifest = [
   "topics/web-fundamentals.js",
-  "topics/kontiolabs-trivia.js"
+  "topics/kontiolabs-trivia.js",
+  "topics/anthropic-architecture.js",
+  "topics/ai-general.js",
+  "topics/cybersecurity.js",
+  "topics/networking.js",
+  "topics/nist-csf.js",
+  "topics/finnish-numbers.js",
+  "topics/finnish-500-words.js",
+  "topics/finnish-500-nouns.js"
 ];

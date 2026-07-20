@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <!-- KONTIO LABS — STUDY: topic picker. Subdirectory depth (../ paths).
-     Spaced-repetition flashcards; progress lives in localStorage ("srs_progress").
-     Topics are loaded from topics/manifest.js — add a topic file + one manifest
-     line, no HTML edits needed. -->
+     Spaced-repetition flashcards; progress lives in localStorage ("srs_progress",
+     settings in "srs_settings"). Topics are loaded from topics/manifest.js —
+     add a topic file + one manifest line, no HTML edits needed. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,6 +52,12 @@
       <strong>Heads up:</strong> your browser is blocking local storage (private browsing?). You can still study, but progress won't be saved between visits.
     </div>
 
+    <div class="srs-settings">
+      <label for="new-per-day"><strong>New cards per day</strong> (per topic)</label>
+      <input type="number" id="new-per-day" min="0" max="500" step="5" inputmode="numeric">
+      <span class="srs-settings-hint">Large decks introduce this many unseen cards each day, on top of scheduled reviews.</span>
+    </div>
+
     <div id="topic-grid" class="topic-grid" aria-live="polite">
       <p class="section-lead">Loading topics…</p>
     </div>
@@ -79,6 +85,16 @@
   if (!SRS.storageAvailable) {
     document.getElementById('storage-warning').hidden = false;
   }
+
+  /* Settings: new cards per day */
+  var newPerDayInput = document.getElementById('new-per-day');
+  newPerDayInput.value = SRS.getSettings().newPerDay;
+  newPerDayInput.addEventListener('change', function () {
+    var v = Math.max(0, Math.min(500, parseInt(newPerDayInput.value, 10) || 0));
+    newPerDayInput.value = v;
+    SRS.saveSettings({ newPerDay: v });
+    renderTopics();
+  });
 
   function el(tag, className, text) {
     var e = document.createElement(tag);
@@ -109,7 +125,7 @@
       statRow.appendChild(el('span', 'topic-stat', stats.total + ' cards'));
       statRow.appendChild(el('span', 'topic-stat due', stats.due + ' due today'));
       statRow.appendChild(el('span', 'topic-stat learned', stats.learned + ' learned'));
-      if (stats.newCards) statRow.appendChild(el('span', 'topic-stat', stats.newCards + ' new'));
+      if (stats.newCards) statRow.appendChild(el('span', 'topic-stat', stats.newCards + ' unseen'));
       card.appendChild(statRow);
 
       var bar = el('div', 'topic-progress');
@@ -123,8 +139,23 @@
       bar.appendChild(fill);
       card.appendChild(bar);
 
-      card.appendChild(el('div', 'topic-cta',
-        stats.due > 0 ? 'Start studying →' : 'All caught up — review anyway →'));
+      var footer = el('div', 'topic-card-foot');
+      footer.appendChild(el('span', 'topic-cta',
+        stats.due > 0 ? 'Start studying →' : 'All caught up — browse deck →'));
+
+      var reset = el('button', 'topic-reset', 'Reset');
+      reset.type = 'button';
+      reset.title = 'Erase saved progress for this topic';
+      reset.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (window.confirm('Erase all saved progress for "' + topic.name + '"? This cannot be undone.')) {
+          SRS.resetTopic(topic.id);
+          renderTopics();
+        }
+      });
+      footer.appendChild(reset);
+      card.appendChild(footer);
 
       grid.appendChild(card);
     });

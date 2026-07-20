@@ -1,25 +1,28 @@
 /* =============================================================================
    KONTIO LABS — Spaced Repetition Study System (SRS) core engine.
    Vanilla JS, global namespace (window.SRS). No dependencies, no build step.
-   Progress lives in localStorage under the key "srs_progress"; when storage is
-   unavailable (private browsing) an in-memory fallback keeps the session
-   working and the UI shows a warning via SRS.storageAvailable.
+   Progress lives in localStorage under "srs_progress", settings under
+   "srs_settings"; when storage is unavailable (private browsing) an in-memory
+   fallback keeps the session working (SRS.storageAvailable exposes the state).
    ============================================================================= */
 (function () {
   'use strict';
 
   var STORAGE_KEY = 'srs_progress';
+  var SETTINGS_KEY = 'srs_settings';
   var MAX_INTERVAL_DAYS = 180;
   var MIN_EASE = 1.3;
   var DEFAULT_EASE = 2.5;
   var LEARNED_INTERVAL_DAYS = 21; /* card counts as "learned" at 21+ day interval */
+  var DEFAULT_NEW_PER_DAY = 20;   /* new-card introduction cap per topic per day */
 
   var SRS = window.SRS = window.SRS || {};
 
   /* ---------------------------------------------------------------------------
      Storage — all reads/writes go through getProgress()/saveProgress().
      --------------------------------------------------------------------------- */
-  var memoryStore = null; /* fallback when localStorage is unavailable */
+  var memoryStore = null;    /* fallback when localStorage is unavailable */
+  var memorySettings = null;
 
   function detectStorage() {
     try {
@@ -55,6 +58,26 @@
     } catch (e) { /* quota/private mode — keep going without persistence */ }
   };
 
+  SRS.getSettings = function () {
+    var defaults = { newPerDay: DEFAULT_NEW_PER_DAY };
+    if (!SRS.storageAvailable) return memorySettings || defaults;
+    try {
+      var raw = window.localStorage.getItem(SETTINGS_KEY);
+      var s = raw ? JSON.parse(raw) : null;
+      if (!s || typeof s.newPerDay !== 'number' || s.newPerDay < 0) return defaults;
+      return s;
+    } catch (e) {
+      return defaults;
+    }
+  };
+
+  SRS.saveSettings = function (settings) {
+    if (!SRS.storageAvailable) { memorySettings = settings; return; }
+    try {
+      window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    } catch (e) { /* non-fatal */ }
+  };
+
   SRS.getCardState = function (topicId, cardId) {
     var p = SRS.getProgress();
     return (p.topics[topicId] && p.topics[topicId][cardId]) || null;
@@ -64,6 +87,24 @@
     var p = SRS.getProgress();
     if (!p.topics[topicId]) p.topics[topicId] = {};
     p.topics[topicId][cardId] = state;
+    SRS.saveProgress(p);
+  };
+
+  SRS.deleteCardState = function (topicId, cardId) {
+    var p = SRS.getProgress();
+    if (p.topics[topicId]) {
+      delete p.topics[topicId][cardId];
+      SRS.saveProgress(p);
+    }
+  };
+
+  /* Wipe all progress (and today's new-card count) for one topic. */
+  SRS.resetTopic = function (topicId) {
+    var p = SRS.getProgress();
+    delete p.topics[topicId];
+    if (p.newIntroduced && p.newIntroduced.byTopic) {
+      delete p.newIntroduced.byTopic[topicId];
+    }
     SRS.saveProgress(p);
   };
 
@@ -85,8 +126,33 @@
   };
 
   /* ---------------------------------------------------------------------------
+     Daily new-card introduction counter. Only today's tally is kept; the
+     structure resets automatically when the date rolls over.
+     --------------------------------------------------------------------------- */
+  function newIntroToday(progress) {
+    var today = SRS.todayStr();
+    if (!progress.newIntroduced || progress.newIntroduced.date !== today) {
+      progress.newIntroduced = { date: today, byTopic: {} };
+    }
+    return progress.newIntroduced;
+  }
+
+  SRS.newIntroducedToday = function (topicId) {
+    var p = SRS.getProgress();
+    var intro = newIntroToday(p);
+    return intro.byTopic[topicId] || 0;
+  };
+
+  /* How many new cards may still be introduced today for a topic. */
+  SRS.newAllowanceLeft = function (topicId) {
+    var limit = SRS.getSettings().newPerDay;
+    return Math.max(0, limit - SRS.newIntroducedToday(topicId));
+  };
+
+  /* ---------------------------------------------------------------------------
      SM-2 (simplified). Ratings: 1 Again, 2 Hard, 3 Good, 4 Easy.
      First Good repetition = 1 day, second = 4 days, then interval × easeFactor.
+     Pure function — no storage side effects.
      --------------------------------------------------------------------------- */
   SRS.review = function (state, rating) {
     var s = state || {};
@@ -121,6 +187,36 @@
     };
   };
 
+  /* Apply a rating: compute + persist the new state, tracking new-card intros.
+     Returns { prevState, newState, wasNew } so the caller can undo. */
+  SRS.applyReview = function (topicId, cardId, rating) {
+    var prevState = SRS.getCardState(topicId, cardId);
+    var wasNew = !prevState;
+    var newState = SRS.review(prevState, rating);
+    var p = SRS.getProgress();
+    if (!p.topics[topicId]) p.topics[topicId] = {};
+    p.topics[topicId][cardId] = newState;
+    if (wasNew) {
+      var intro = newIntroToday(p);
+      intro.byTopic[topicId] = (intro.byTopic[topicId] || 0) + 1;
+    }
+    SRS.saveProgress(p);
+    return { prevState: prevState, newState: newState, wasNew: wasNew };
+  };
+
+  /* Undo a review recorded by applyReview. */
+  SRS.undoReview = function (topicId, cardId, prevState, wasNew) {
+    var p = SRS.getProgress();
+    if (!p.topics[topicId]) p.topics[topicId] = {};
+    if (prevState) p.topics[topicId][cardId] = prevState;
+    else delete p.topics[topicId][cardId];
+    if (wasNew) {
+      var intro = newIntroToday(p);
+      intro.byTopic[topicId] = Math.max(0, (intro.byTopic[topicId] || 0) - 1);
+    }
+    SRS.saveProgress(p);
+  };
+
   /* ---------------------------------------------------------------------------
      Topic registry + manifest loader. Topic files call SRS.registerTopic(...)
      and manifest.js sets SRS.manifest = ["topics/foo.js", ...].
@@ -151,30 +247,46 @@
   };
 
   /* ---------------------------------------------------------------------------
-     Per-topic stats for the picker page.
+     Due-card selection and per-topic stats.
+     "Due" = review cards whose dueDate has arrived, plus unseen (new) cards
+     up to the remaining daily new-card allowance.
      --------------------------------------------------------------------------- */
+  SRS.dueBreakdown = function (topic) {
+    var p = SRS.getProgress();
+    var states = p.topics[topic.id] || {};
+    var today = SRS.todayStr();
+    var reviews = [];
+    var newCards = [];
+    topic.cards.forEach(function (card) {
+      var st = states[card.id];
+      if (!st) newCards.push(card);
+      else if (st.dueDate <= today) reviews.push(card);
+    });
+    return { reviews: reviews, newCards: newCards };
+  };
+
+  /* Cards for today's session: all due reviews + allowance-limited new cards. */
+  SRS.dueCards = function (topic) {
+    var b = SRS.dueBreakdown(topic);
+    var allowance = SRS.newAllowanceLeft(topic.id);
+    return b.reviews.concat(b.newCards.slice(0, allowance));
+  };
+
   SRS.topicStats = function (topic) {
     var p = SRS.getProgress();
     var states = p.topics[topic.id] || {};
-    var today = SRS.todayStr();
-    var stats = { total: topic.cards.length, due: 0, newCards: 0, learned: 0 };
+    var b = SRS.dueBreakdown(topic);
+    var allowance = SRS.newAllowanceLeft(topic.id);
+    var learned = 0;
     topic.cards.forEach(function (card) {
       var st = states[card.id];
-      if (!st) { stats.newCards++; stats.due++; return; }
-      if (st.dueDate <= today) stats.due++;
-      if (st.interval >= LEARNED_INTERVAL_DAYS) stats.learned++;
+      if (st && st.interval >= LEARNED_INTERVAL_DAYS) learned++;
     });
-    return stats;
-  };
-
-  /* Cards due right now for a topic (new cards count as due). */
-  SRS.dueCards = function (topic) {
-    var p = SRS.getProgress();
-    var states = p.topics[topic.id] || {};
-    var today = SRS.todayStr();
-    return topic.cards.filter(function (card) {
-      var st = states[card.id];
-      return !st || st.dueDate <= today;
-    });
+    return {
+      total: topic.cards.length,
+      due: b.reviews.length + Math.min(b.newCards.length, allowance),
+      newCards: b.newCards.length,
+      learned: learned
+    };
   };
 })();

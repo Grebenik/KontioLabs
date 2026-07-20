@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <!-- KONTIO LABS — STUDY: flashcard session. Subdirectory depth (../ paths).
-     Opened as session.html?topic=<topic-id>. Space/Enter flips, 1–4 rates
-     (Again/Hard/Good/Easy). SM-2 scheduling via ../study/srs.js. -->
+     Opened as session.html?topic=<topic-id>.
+     Two modes: "Today" (due cards, SM-2 ratings, Back = undo last rating) and
+     "All cards" (browse whole deck in order; ratings optional).
+     Keys: Space/Enter flip · ←/→ back/next · Home/End first/last · 1–4 rate. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -50,11 +52,27 @@
         <div class="session-count" id="session-count" aria-live="polite"></div>
       </div>
 
+      <!-- Mode switch -->
+      <div class="mode-row" role="group" aria-label="Study mode">
+        <button type="button" id="mode-today" class="mode-btn is-active">Today's review</button>
+        <button type="button" id="mode-all" class="mode-btn">All cards</button>
+        <button type="button" id="finish-btn" class="mode-btn finish">Finish &amp; summary</button>
+      </div>
+
       <button type="button" id="flashcard" class="flashcard" aria-live="polite">
         <span class="flashcard-side-label" id="card-side-label">Question</span>
         <span class="flashcard-text" id="card-text"></span>
-        <span class="flashcard-hint" id="card-hint">Tap or press Space / Enter to flip</span>
+        <span class="flashcard-hint" id="card-hint"></span>
       </button>
+
+      <!-- Navigation toolbar -->
+      <div class="nav-toolbar" role="group" aria-label="Card navigation">
+        <button type="button" id="nav-first" class="nav-btn" title="">⏮<small id="nav-first-label">Day start</small></button>
+        <button type="button" id="nav-back" class="nav-btn" title="">◀<small id="nav-back-label">Undo</small></button>
+        <button type="button" id="nav-flip" class="nav-btn flip-btn" title="Flip the card (Space / Enter)">🔄<small id="nav-flip-label">Flip</small></button>
+        <button type="button" id="nav-next" class="nav-btn" title="">▶<small id="nav-next-label">Skip</small></button>
+        <button type="button" id="nav-last" class="nav-btn" title="">⏭<small id="nav-last-label">Day end</small></button>
+      </div>
 
       <div class="rating-row" id="rating-row" hidden>
         <button type="button" class="rating-btn again" data-rating="1">Again <small>&lt; 1 day</small><span class="rating-key">1</span></button>
@@ -62,16 +80,20 @@
         <button type="button" class="rating-btn good"  data-rating="3">Good  <small id="hint-good"></small><span class="rating-key">3</span></button>
         <button type="button" class="rating-btn easy"  data-rating="4">Easy  <small id="hint-easy"></small><span class="rating-key">4</span></button>
       </div>
+
+      <p class="kbd-help">Keyboard: <kbd>Space</kbd>/<kbd>Enter</kbd> flip · <kbd>←</kbd>/<kbd>→</kbd> back / next · <kbd>Home</kbd>/<kbd>End</kbd> start / end · <kbd>1</kbd>–<kbd>4</kbd> rate</p>
+
+      <div id="toast" class="srs-toast" role="status" aria-live="polite" hidden></div>
     </section>
 
     <!-- Nothing due -->
     <section id="empty-view" hidden>
       <div class="content-card">
         <h2>You're all caught up 🎉</h2>
-        <p>No cards are due in this topic today. Come back when reviews are scheduled — or review the whole deck anyway (early reviews still update each card's schedule).</p>
+        <p>No cards are due in this topic today (new cards are limited per day — you can raise that on the Study page). You can still browse and review the whole deck; early reviews update each card's schedule.</p>
         <div class="btn-row">
           <a href="index.html" class="cta-btn">← Back to topics</a>
-          <button type="button" id="review-anyway" class="cta-btn-outline">Review all cards anyway</button>
+          <button type="button" id="browse-anyway" class="cta-btn-outline">Browse all cards</button>
         </div>
       </div>
     </section>
@@ -89,6 +111,7 @@
         <ul class="next-due-list" id="next-due-list"></ul>
         <div class="btn-row" style="margin-top:16px;">
           <a href="index.html" class="cta-btn">← Back to topics</a>
+          <button type="button" id="summary-browse" class="cta-btn-outline">Browse all cards</button>
         </div>
       </div>
     </section>
@@ -142,47 +165,62 @@
   var cardHint   = document.getElementById('card-hint');
   var ratingRow  = document.getElementById('rating-row');
   var countLabel = document.getElementById('session-count');
+  var toastEl    = document.getElementById('toast');
 
   var topic = null;
-  var queue = [];          /* cards left this session; "Again" cards requeue */
+  var mode = 'today';        /* 'today' (due queue) | 'all' (browse deck) */
+  var queue = [];            /* today mode: cards remaining; Again requeues */
+  var dayQueueOriginal = []; /* today mode: snapshot for "Day start" restart */
+  var browseIndex = 0;       /* all mode: position in topic.cards */
   var current = null;
   var flipped = false;
+  var history = [];          /* rated cards, for Back/undo in today mode */
   var stats = { reviewed: 0, correct: 0, again: 0 };
-  var reviewedIds = {};    /* distinct cards seen, for the summary's due list */
+  var reviewedIds = {};      /* distinct cards rated, for the summary due list */
+  var toastTimer = null;
 
-  function startSession(cards) {
-    queue = cards.slice();
-    /* shuffle so the order varies between sessions */
-    for (var i = queue.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var t = queue[i]; queue[i] = queue[j]; queue[j] = t;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.hidden = true; }, 2200);
+  }
+
+  /* --- rendering --- */
+  function renderCard(showBack) {
+    flipped = !!showBack;
+    sideLabel.textContent = flipped ? 'Answer' : 'Question';
+    cardText.textContent = flipped ? current.back : current.front;
+    cardHint.textContent = flipped
+      ? 'How well did you remember? (1–4) — or flip back'
+      : 'Tap or press Space / Enter to flip';
+    flashcard.classList.toggle('is-back', flipped);
+    if (flipped) updateIntervalHints();
+    ratingRow.hidden = !flipped;
+    updateStatus();
+  }
+
+  function updateStatus() {
+    if (mode === 'today') {
+      var left = queue.length + (current ? 1 : 0);
+      countLabel.textContent = left + ' card' + (left === 1 ? '' : 's') + ' left today · ' + stats.reviewed + ' reviewed';
+    } else {
+      countLabel.textContent = 'Card ' + (browseIndex + 1) + ' of ' + topic.cards.length;
     }
-    show('session');
-    nextCard();
   }
 
-  function nextCard() {
-    if (!queue.length) { showSummary(); return; }
-    current = queue.shift();
-    flipped = false;
-    sideLabel.textContent = 'Question';
-    cardText.textContent = current.front;
-    cardHint.textContent = 'Tap or press Space / Enter to flip';
-    flashcard.classList.remove('is-back');
-    ratingRow.hidden = true;
-    countLabel.textContent = (queue.length + 1) + ' card' + (queue.length ? 's' : '') + ' left';
-    flashcard.focus();
-  }
-
-  function flip() {
-    if (flipped || !current) return;
-    flipped = true;
-    sideLabel.textContent = 'Answer';
-    cardText.textContent = current.back;
-    cardHint.textContent = 'How well did you remember? (1–4)';
-    flashcard.classList.add('is-back');
-    updateIntervalHints();
-    ratingRow.hidden = false;
+  function updateModeUi() {
+    document.getElementById('mode-today').classList.toggle('is-active', mode === 'today');
+    document.getElementById('mode-all').classList.toggle('is-active', mode === 'all');
+    var today = mode === 'today';
+    document.getElementById('nav-first-label').textContent = today ? 'Day start' : 'First';
+    document.getElementById('nav-back-label').textContent  = today ? 'Undo' : 'Prev';
+    document.getElementById('nav-next-label').textContent  = today ? 'Skip' : 'Next';
+    document.getElementById('nav-last-label').textContent  = today ? 'Day end' : 'Last';
+    document.getElementById('nav-first').title = today ? 'Restart today’s session from the beginning (Home)' : 'Jump to the first card (Home)';
+    document.getElementById('nav-back').title  = today ? 'Undo the last rating and go back one card (←)' : 'Previous card (←)';
+    document.getElementById('nav-next').title  = today ? 'Skip this card for now — it returns later in the session (→)' : 'Next card (→)';
+    document.getElementById('nav-last').title  = today ? 'End today’s section and see the summary (End)' : 'Jump to the last card (End)';
   }
 
   /* Show what each rating would schedule, e.g. "4 days". */
@@ -197,17 +235,121 @@
     document.getElementById('hint-easy').textContent = label(4);
   }
 
+  /* --- today (review) mode --- */
+  function startDaySession(cards) {
+    mode = 'today';
+    dayQueueOriginal = cards.slice();
+    queue = cards.slice();
+    /* shuffle so order varies between sessions */
+    for (var i = queue.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = queue[i]; queue[i] = queue[j]; queue[j] = t;
+    }
+    history = [];
+    updateModeUi();
+    show('session');
+    nextCardToday();
+  }
+
+  function nextCardToday() {
+    if (!queue.length) { current = null; showSummary(); return; }
+    current = queue.shift();
+    renderCard(false);
+    flashcard.focus();
+  }
+
+  /* --- all-cards (browse) mode --- */
+  function startBrowse(atIndex) {
+    mode = 'all';
+    browseIndex = Math.max(0, Math.min(atIndex || 0, topic.cards.length - 1));
+    current = topic.cards[browseIndex];
+    updateModeUi();
+    show('session');
+    renderCard(false);
+    flashcard.focus();
+  }
+
+  function browseGo(index) {
+    if (index < 0) { toast('Already at the first card'); return; }
+    if (index >= topic.cards.length) { showSummary(); return; }
+    browseIndex = index;
+    current = topic.cards[browseIndex];
+    renderCard(false);
+  }
+
+  /* --- shared actions --- */
+  function flip() {
+    if (!current) return;
+    renderCard(!flipped); /* forward AND back */
+  }
+
   function rate(rating) {
     if (!flipped || !current) return;
-    var newState = SRS.review(SRS.getCardState(topic.id, current.id), rating);
-    SRS.setCardState(topic.id, current.id, newState);
+    var rec = SRS.applyReview(topic.id, current.id, rating);
+    history.push({ card: current, prevState: rec.prevState, wasNew: rec.wasNew, mode: mode, index: browseIndex });
 
     stats.reviewed++;
     if (rating >= 3) stats.correct++;
-    if (rating === 1) { stats.again++; queue.push(current); } /* see it again this session */
+    if (rating === 1) stats.again++;
     reviewedIds[current.id] = true;
 
-    nextCard();
+    if (mode === 'today') {
+      if (rating === 1) queue.push(current); /* see it again this session */
+      nextCardToday();
+    } else {
+      browseGo(browseIndex + 1);
+    }
+  }
+
+  function goBack() {
+    if (mode === 'all') {
+      /* plain navigation; also undo if the previous card was just rated here */
+      var last = history[history.length - 1];
+      if (last && last.mode === 'all' && last.index === browseIndex - 1) {
+        history.pop();
+        SRS.undoReview(topic.id, last.card.id, last.prevState, last.wasNew);
+        stats.reviewed = Math.max(0, stats.reviewed - 1);
+        toast('Rating undone');
+      }
+      browseGo(browseIndex - 1);
+      return;
+    }
+    /* today mode: undo last rating */
+    var entry = history.pop();
+    if (!entry || entry.mode !== 'today') {
+      if (entry) history.push(entry);
+      toast('Nothing to undo');
+      return;
+    }
+    SRS.undoReview(topic.id, entry.card.id, entry.prevState, entry.wasNew);
+    stats.reviewed = Math.max(0, stats.reviewed - 1);
+    if (current) queue.unshift(current);
+    /* if the card had been requeued by "Again", remove that copy */
+    var i = queue.indexOf(entry.card);
+    if (i !== -1) queue.splice(i, 1);
+    current = entry.card;
+    renderCard(false);
+    toast('Rating undone');
+  }
+
+  function goNext() {
+    if (!current) return;
+    if (mode === 'all') { browseGo(browseIndex + 1); return; }
+    /* today mode: skip without rating; card returns later */
+    if (!queue.length) { toast('This is the only card left — rate it to finish'); return; }
+    queue.push(current);
+    nextCardToday();
+  }
+
+  function goFirst() {
+    if (mode === 'all') { browseGo(0); return; }
+    startDaySession(dayQueueOriginal); /* back to the beginning of the day */
+    toast('Restarted today’s session');
+  }
+
+  function goLast() {
+    if (mode === 'all') { browseGo(topic.cards.length - 1); return; }
+    showSummary(); /* end of the day's section */
   }
 
   function showSummary() {
@@ -216,7 +358,7 @@
       stats.reviewed ? Math.round(stats.correct / stats.reviewed * 100) + '%' : '—';
     document.getElementById('sum-again').textContent = stats.again;
 
-    /* group reviewed cards by their next due date */
+    /* group rated cards by their next due date */
     var byDate = {};
     Object.keys(reviewedIds).forEach(function (cardId) {
       var st = SRS.getCardState(topic.id, cardId);
@@ -234,7 +376,7 @@
     });
     if (!Object.keys(byDate).length) {
       var none = document.createElement('li');
-      none.textContent = 'No cards reviewed.';
+      none.textContent = 'No cards rated this session.';
       list.appendChild(none);
     }
     show('summary');
@@ -242,23 +384,50 @@
 
   /* --- events --- */
   flashcard.addEventListener('click', flip);
+  document.getElementById('nav-flip').addEventListener('click', flip);
+  document.getElementById('nav-back').addEventListener('click', goBack);
+  document.getElementById('nav-next').addEventListener('click', goNext);
+  document.getElementById('nav-first').addEventListener('click', goFirst);
+  document.getElementById('nav-last').addEventListener('click', goLast);
+  document.getElementById('finish-btn').addEventListener('click', showSummary);
+
+  document.getElementById('mode-today').addEventListener('click', function () {
+    if (mode === 'today') return;
+    var due = SRS.dueCards(topic);
+    if (due.length) startDaySession(due);
+    else { show('empty'); }
+  });
+  document.getElementById('mode-all').addEventListener('click', function () {
+    if (mode !== 'all') startBrowse(0);
+  });
+
   Array.prototype.forEach.call(document.querySelectorAll('.rating-btn'), function (btn) {
     btn.addEventListener('click', function () { rate(+btn.getAttribute('data-rating')); });
   });
+
   document.addEventListener('keydown', function (e) {
     if (views.session.hidden) return;
+    var active = document.activeElement;
     if (e.key === ' ' || e.key === 'Enter') {
-      /* let Enter/Space activate a focused rating button normally */
-      if (document.activeElement && document.activeElement.classList.contains('rating-btn')) return;
+      /* let Enter/Space activate a focused button normally */
+      if (active && active.tagName === 'BUTTON' && active !== flashcard) return;
       e.preventDefault();
       flip();
     } else if (['1', '2', '3', '4'].indexOf(e.key) !== -1) {
       rate(+e.key);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault(); goBack();
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault(); goNext();
+    } else if (e.key === 'Home') {
+      e.preventDefault(); goFirst();
+    } else if (e.key === 'End') {
+      e.preventDefault(); goLast();
     }
   });
-  document.getElementById('review-anyway').addEventListener('click', function () {
-    startSession(topic.cards);
-  });
+
+  document.getElementById('browse-anyway').addEventListener('click', function () { startBrowse(0); });
+  document.getElementById('summary-browse').addEventListener('click', function () { startBrowse(0); });
 
   /* --- boot --- */
   SRS.loadTopics(function () {
@@ -269,9 +438,10 @@
     document.getElementById('crumb-topic').textContent = topic.name;
     document.getElementById('session-topic-name').textContent = topic.name;
     document.title = topic.name + ' — Study Session | Kontio Labs';
+    document.getElementById('mode-all').textContent = 'All cards (' + topic.cards.length + ')';
 
     var due = SRS.dueCards(topic);
-    if (due.length) startSession(due);
+    if (due.length) startDaySession(due);
     else show('empty');
   });
 })();
