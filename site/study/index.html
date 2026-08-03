@@ -163,9 +163,10 @@
   }
 
   /* Group topics by their declared "group" (each topic file self-describes
-     which section it belongs to). Groups render in first-appearance order
-     (which follows manifest.js order); topics not tagged with a group fall
-     into a trailing "Other" section rather than disappearing. */
+     which section it belongs to). Groups and the topics within each group
+     are sorted alphabetically by name so the list is easy to scan; topics
+     not tagged with a group fall into a trailing "Other" section rather
+     than disappearing. */
   function renderTopics() {
     var grid = document.getElementById('topic-grid');
     grid.textContent = '';
@@ -182,6 +183,10 @@
       var group = topic.group || 'Other';
       if (!groupedTopics[group]) { groupedTopics[group] = []; groupOrder.push(group); }
       groupedTopics[group].push(topic);
+    });
+    groupOrder.sort(function (a, b) { return a.localeCompare(b); });
+    groupOrder.forEach(function (group) {
+      groupedTopics[group].sort(function (a, b) { return a.name.localeCompare(b.name); });
     });
 
     groupOrder.forEach(function (group) {
