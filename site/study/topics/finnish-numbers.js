@@ -5,6 +5,7 @@
    script instead. Front = digits, back = the Finnish word. */
 SRS.registerTopic({
   id: "finnish-numbers",
+  group: "Finnish",
   name: "Finnish Numbers",
   description: "Finnish cardinal numbers 0 to 2,000,000, ordinals 1st-10th, and core counting vocabulary — generated programmatically for consistent number-formation patterns.",
   cards: [

@@ -8,6 +8,7 @@
    script instead. */
 SRS.registerTopic({
   id: "russian-numbers",
+  group: "Russian",
   name: "Russian Numbers",
   description: "Russian cardinal numbers 0 to 2,000,000, ordinals 1st-10th, and core counting vocabulary — for English-speaking learners of Russian.",
   cards: [

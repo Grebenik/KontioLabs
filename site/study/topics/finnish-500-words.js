@@ -6,6 +6,7 @@
    Front = Finnish word, back = English meaning. */
 SRS.registerTopic({
   id: "finnish-500-words",
+  group: "Finnish",
   name: "Finnish: 500 Popular Words",
   description: "The 500 most useful everyday Finnish words — pronouns, verbs, adjectives, nouns, and function words — for building general fluency fast.",
   cards: [

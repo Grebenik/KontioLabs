@@ -284,6 +284,7 @@ const header = `/* Topic: Russian — 500 Nouns. Concrete and abstract nouns acr
    edit the SECTIONS array there and re-run rather than hand-editing this file. */
 SRS.registerTopic({
   id: "russian-500-nouns",
+  group: "Russian",
   name: "Russian: 500 Nouns",
   description: "500 Russian nouns across household, nature, animals, professions, places, technology, science, food, and more — for English-speaking learners of Russian.",
   cards: [

@@ -2,6 +2,7 @@
    Cards card-001..card-015 keep their original ids so saved progress carries over. */
 SRS.registerTopic({
   id: "web-fundamentals",
+  group: "Technology & Security",
   name: "Web Fundamentals",
   description: "HTML, CSS, JavaScript, HTTP and browser concepts every web developer should know cold.",
   cards: [

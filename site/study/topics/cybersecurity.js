@@ -1,6 +1,7 @@
 /* Topic: Cybersecurity Studies — core security concepts, attacks, defenses, ops. */
 SRS.registerTopic({
   id: "cybersecurity",
+  group: "Technology & Security",
   name: "Cybersecurity Studies",
   description: "Security fundamentals: the CIA triad, cryptography, attacks and defenses, identity, network security, and incident response.",
   cards: [

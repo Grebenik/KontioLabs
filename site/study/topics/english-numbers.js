@@ -7,6 +7,7 @@
    script instead. */
 SRS.registerTopic({
   id: "english-numbers",
+  group: "English",
   name: "English Numbers",
   description: "English cardinal numbers 0 to 2,000,000, ordinals 1st-10th, and core counting vocabulary — for Russian-speaking learners of English.",
   cards: [

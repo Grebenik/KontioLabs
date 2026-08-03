@@ -3,6 +3,7 @@
    standards. Accurate to the CSF 2.0 publication (Feb 2024). */
 SRS.registerTopic({
   id: "nist-csf",
+  group: "Technology & Security",
   name: "NIST CSF",
   description: "NIST Cybersecurity Framework 2.0 — Govern, Identify, Protect, Detect, Respond, Recover, plus Tiers, Profiles, and how it maps to other standards.",
   cards: [

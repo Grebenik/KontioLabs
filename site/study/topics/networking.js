@@ -1,6 +1,7 @@
 /* Topic: Networking Studies — OSI/TCP-IP, addressing, routing, protocols, services. */
 SRS.registerTopic({
   id: "networking",
+  group: "Technology & Security",
   name: "Networking Studies",
   description: "Computer networking: OSI and TCP/IP models, IP addressing and subnetting, routing, switching, and the core protocols.",
   cards: [

@@ -268,6 +268,7 @@ const header = `/* Topic: Russian — 500 Popular Words. High-frequency vocabula
    edit the SECTIONS array there and re-run rather than hand-editing this file. */
 SRS.registerTopic({
   id: "russian-500-words",
+  group: "Russian",
   name: "Russian: 500 Popular Words",
   description: "The 500 most useful everyday Russian words — pronouns, verbs, adjectives, nouns, and function words — for English-speaking learners building general fluency fast.",
   cards: [

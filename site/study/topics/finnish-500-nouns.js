@@ -6,6 +6,7 @@
    Front = Finnish noun, back = English meaning. */
 SRS.registerTopic({
   id: "finnish-500-nouns",
+  group: "Finnish",
   name: "Finnish: 500 Nouns",
   description: "500 Finnish nouns across household, nature, animals, professions, places, technology, science, food, and more.",
   cards: [

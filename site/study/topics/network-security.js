@@ -6,6 +6,7 @@
    Studies deck, which covers protocols/addressing rather than security. */
 SRS.registerTopic({
   id: "network-security",
+  group: "Technology & Security",
   name: "Network Security",
   description: "Certification exam prep for network security: firewalls, IDS/IPS, segmentation and zero trust, VPN/PKI/TLS, common attacks and mitigations, hardening, and monitoring.",
   cards: [

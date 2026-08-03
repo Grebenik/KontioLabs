@@ -69,7 +69,7 @@
       <span class="srs-settings-hint">Large decks introduce this many unseen cards each day, on top of scheduled reviews.</span>
     </div>
 
-    <div id="topic-grid" class="topic-grid" aria-live="polite">
+    <div id="topic-grid" class="topic-groups" aria-live="polite">
       <p class="section-lead">Loading topics…</p>
     </div>
 
@@ -115,6 +115,57 @@
     return e;
   }
 
+  function buildTopicCard(topic) {
+    var stats = SRS.topicStats(topic);
+    var card = el('a', 'topic-card' + (stats.due === 0 ? ' all-done' : ''));
+    card.href = 'session.html?topic=' + encodeURIComponent(topic.id);
+
+    card.appendChild(el('div', 'topic-name', topic.name));
+    card.appendChild(el('div', 'topic-desc', topic.description || ''));
+
+    var statRow = el('div', 'topic-stats');
+    statRow.appendChild(el('span', 'topic-stat', stats.total + ' cards'));
+    statRow.appendChild(el('span', 'topic-stat due', stats.due + ' due today'));
+    statRow.appendChild(el('span', 'topic-stat learned', stats.learned + ' learned'));
+    if (stats.newCards) statRow.appendChild(el('span', 'topic-stat', stats.newCards + ' unseen'));
+    card.appendChild(statRow);
+
+    var bar = el('div', 'topic-progress');
+    bar.setAttribute('role', 'progressbar');
+    bar.setAttribute('aria-valuemin', '0');
+    bar.setAttribute('aria-valuemax', String(stats.total));
+    bar.setAttribute('aria-valuenow', String(stats.learned));
+    bar.setAttribute('aria-label', topic.name + ': ' + stats.learned + ' of ' + stats.total + ' cards learned');
+    var fill = el('div', 'topic-progress-fill');
+    fill.style.width = (stats.total ? Math.round(stats.learned / stats.total * 100) : 0) + '%';
+    bar.appendChild(fill);
+    card.appendChild(bar);
+
+    var footer = el('div', 'topic-card-foot');
+    footer.appendChild(el('span', 'topic-cta',
+      stats.due > 0 ? 'Start studying →' : 'All caught up — browse deck →'));
+
+    var reset = el('button', 'topic-reset', 'Reset');
+    reset.type = 'button';
+    reset.title = 'Erase saved progress for this topic';
+    reset.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (window.confirm('Erase all saved progress for "' + topic.name + '"? This cannot be undone.')) {
+        SRS.resetTopic(topic.id);
+        renderTopics();
+      }
+    });
+    footer.appendChild(reset);
+    card.appendChild(footer);
+
+    return card;
+  }
+
+  /* Group topics by their declared "group" (each topic file self-describes
+     which section it belongs to). Groups render in first-appearance order
+     (which follows manifest.js order); topics not tagged with a group fall
+     into a trailing "Other" section rather than disappearing. */
   function renderTopics() {
     var grid = document.getElementById('topic-grid');
     grid.textContent = '';
@@ -125,51 +176,23 @@
       return;
     }
 
+    var groupOrder = [];
+    var groupedTopics = {};
     topics.forEach(function (topic) {
-      var stats = SRS.topicStats(topic);
-      var card = el('a', 'topic-card' + (stats.due === 0 ? ' all-done' : ''));
-      card.href = 'session.html?topic=' + encodeURIComponent(topic.id);
+      var group = topic.group || 'Other';
+      if (!groupedTopics[group]) { groupedTopics[group] = []; groupOrder.push(group); }
+      groupedTopics[group].push(topic);
+    });
 
-      card.appendChild(el('div', 'topic-name', topic.name));
-      card.appendChild(el('div', 'topic-desc', topic.description || ''));
-
-      var statRow = el('div', 'topic-stats');
-      statRow.appendChild(el('span', 'topic-stat', stats.total + ' cards'));
-      statRow.appendChild(el('span', 'topic-stat due', stats.due + ' due today'));
-      statRow.appendChild(el('span', 'topic-stat learned', stats.learned + ' learned'));
-      if (stats.newCards) statRow.appendChild(el('span', 'topic-stat', stats.newCards + ' unseen'));
-      card.appendChild(statRow);
-
-      var bar = el('div', 'topic-progress');
-      bar.setAttribute('role', 'progressbar');
-      bar.setAttribute('aria-valuemin', '0');
-      bar.setAttribute('aria-valuemax', String(stats.total));
-      bar.setAttribute('aria-valuenow', String(stats.learned));
-      bar.setAttribute('aria-label', topic.name + ': ' + stats.learned + ' of ' + stats.total + ' cards learned');
-      var fill = el('div', 'topic-progress-fill');
-      fill.style.width = (stats.total ? Math.round(stats.learned / stats.total * 100) : 0) + '%';
-      bar.appendChild(fill);
-      card.appendChild(bar);
-
-      var footer = el('div', 'topic-card-foot');
-      footer.appendChild(el('span', 'topic-cta',
-        stats.due > 0 ? 'Start studying →' : 'All caught up — browse deck →'));
-
-      var reset = el('button', 'topic-reset', 'Reset');
-      reset.type = 'button';
-      reset.title = 'Erase saved progress for this topic';
-      reset.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (window.confirm('Erase all saved progress for "' + topic.name + '"? This cannot be undone.')) {
-          SRS.resetTopic(topic.id);
-          renderTopics();
-        }
+    groupOrder.forEach(function (group) {
+      var section = el('section', 'topic-group');
+      section.appendChild(el('h2', 'topic-group-title', group));
+      var sectionGrid = el('div', 'topic-grid');
+      groupedTopics[group].forEach(function (topic) {
+        sectionGrid.appendChild(buildTopicCard(topic));
       });
-      footer.appendChild(reset);
-      card.appendChild(footer);
-
-      grid.appendChild(card);
+      section.appendChild(sectionGrid);
+      grid.appendChild(section);
     });
   }
 

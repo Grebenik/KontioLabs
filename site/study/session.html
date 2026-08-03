@@ -70,9 +70,9 @@
       <!-- Navigation toolbar -->
       <div class="nav-toolbar" role="group" aria-label="Card navigation">
         <button type="button" id="nav-first" class="nav-btn" title="">⏮<small id="nav-first-label">Day start</small></button>
-        <button type="button" id="nav-back" class="nav-btn" title="">◀<small id="nav-back-label">Undo</small></button>
+        <button type="button" id="nav-back" class="nav-btn" title="">◀<small id="nav-back-label">Previous word</small></button>
         <button type="button" id="nav-flip" class="nav-btn flip-btn" title="Flip the card (Space / Enter)">🔄<small id="nav-flip-label">Flip</small></button>
-        <button type="button" id="nav-next" class="nav-btn" title="">▶<small id="nav-next-label">Skip</small></button>
+        <button type="button" id="nav-next" class="nav-btn" title="">▶<small id="nav-next-label">Next word</small></button>
         <button type="button" id="nav-last" class="nav-btn" title="">⏭<small id="nav-last-label">Day end</small></button>
       </div>
 
@@ -217,12 +217,12 @@
     document.getElementById('mode-all').classList.toggle('is-active', mode === 'all');
     var today = mode === 'today';
     document.getElementById('nav-first-label').textContent = today ? 'Day start' : 'First';
-    document.getElementById('nav-back-label').textContent  = today ? 'Undo' : 'Prev';
-    document.getElementById('nav-next-label').textContent  = today ? 'Skip' : 'Next';
+    document.getElementById('nav-back-label').textContent  = 'Previous word';
+    document.getElementById('nav-next-label').textContent  = 'Next word';
     document.getElementById('nav-last-label').textContent  = today ? 'Day end' : 'Last';
     document.getElementById('nav-first').title = today ? 'Restart today’s session from the beginning (Home)' : 'Jump to the first card (Home)';
-    document.getElementById('nav-back').title  = today ? 'Undo the last rating and go back one card (←)' : 'Previous card (←)';
-    document.getElementById('nav-next').title  = today ? 'Skip this card for now — it returns later in the session (→)' : 'Next card (→)';
+    document.getElementById('nav-back').title  = today ? 'Go to the previous word — undoes its rating if you just answered it (←)' : 'Go to the previous word (←)';
+    document.getElementById('nav-next').title  = today ? 'Go to the next word — this one returns later in the session (→)' : 'Go to the next word (→)';
     document.getElementById('nav-last').title  = today ? 'End today’s section and see the summary (End)' : 'Jump to the last card (End)';
   }
 

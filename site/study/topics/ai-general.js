@@ -1,6 +1,7 @@
 /* Topic: AI Studies General — machine learning, deep learning and LLM concepts. */
 SRS.registerTopic({
   id: "ai-general",
+  group: "Technology & Security",
   name: "AI Studies General",
   description: "Machine learning, deep learning, and large-language-model fundamentals — from gradient descent to RAG and alignment.",
   cards: [

@@ -7,6 +7,7 @@
    header strings against current docs before an exam or production use. */
 SRS.registerTopic({
   id: "anthropic-architecture",
+  group: "Technology & Security",
   name: "Anthropic AI Architecture",
   description: "Certification exam prep for the Claude platform: models, Messages API, tool use, MCP, agents, prompt caching, context management, platform operations, agent security, and Anthropic's safety framework.",
   cards: [

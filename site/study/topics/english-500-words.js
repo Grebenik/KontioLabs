@@ -7,6 +7,7 @@
    edit the SECTIONS array there and re-run rather than hand-editing this file. */
 SRS.registerTopic({
   id: "english-500-words",
+  group: "English",
   name: "English: 500 Popular Words",
   description: "The 500 most useful everyday English words — pronouns, verbs, adjectives, nouns, and function words — for Russian-speaking learners building general fluency fast.",
   cards: [
