@@ -11,5 +11,11 @@ SRS.manifest = [
   "topics/nist-csf.js",
   "topics/finnish-numbers.js",
   "topics/finnish-500-words.js",
-  "topics/finnish-500-nouns.js"
+  "topics/finnish-500-nouns.js",
+  "topics/english-numbers.js",
+  "topics/english-500-words.js",
+  "topics/english-500-nouns.js",
+  "topics/russian-numbers.js",
+  "topics/russian-500-words.js",
+  "topics/russian-500-nouns.js"
 ];
