@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- KONTIO LABS — STUDY: flashcard session. Subdirectory depth (../ paths).
      Opened as session.html?topic=<topic-id>.
-     Two modes: "Today" (due cards, SM-2 ratings, Back = undo last rating) and
+     Two modes: "Today" (due cards, SM-2 ratings, Back = previous word, undoing its rating if it had one) and
      "All cards" (browse whole deck in order; ratings optional).
      Keys: Space/Enter flip · ←/→ back/next · Home/End first/last · 1–4 rate. -->
 <html lang="en">
@@ -288,8 +288,9 @@
 
   function rate(rating) {
     if (!flipped || !current) return;
+    var queueSnapshot = mode === 'today' ? queue.slice() : null;
     var rec = SRS.applyReview(topic.id, current.id, rating);
-    history.push({ card: current, prevState: rec.prevState, wasNew: rec.wasNew, mode: mode, index: browseIndex });
+    history.push({ card: current, prevState: rec.prevState, wasNew: rec.wasNew, mode: mode, index: browseIndex, queueSnapshot: queueSnapshot, rated: true, rating: rating });
 
     stats.reviewed++;
     if (rating >= 3) stats.correct++;
@@ -317,22 +318,23 @@
       browseGo(browseIndex - 1);
       return;
     }
-    /* today mode: undo last rating */
+    /* today mode: step back to the previous word, undoing its rating if it had one */
     var entry = history.pop();
     if (!entry || entry.mode !== 'today') {
       if (entry) history.push(entry);
       toast('Nothing to undo');
       return;
     }
-    SRS.undoReview(topic.id, entry.card.id, entry.prevState, entry.wasNew);
-    stats.reviewed = Math.max(0, stats.reviewed - 1);
-    if (current) queue.unshift(current);
-    /* if the card had been requeued by "Again", remove that copy */
-    var i = queue.indexOf(entry.card);
-    if (i !== -1) queue.splice(i, 1);
+    if (entry.rated) {
+      SRS.undoReview(topic.id, entry.card.id, entry.prevState, entry.wasNew);
+      stats.reviewed = Math.max(0, stats.reviewed - 1);
+      if (entry.rating >= 3) stats.correct = Math.max(0, stats.correct - 1);
+      if (entry.rating === 1) stats.again = Math.max(0, stats.again - 1);
+    }
+    queue = entry.queueSnapshot;
     current = entry.card;
     renderCard(false);
-    toast('Rating undone');
+    toast(entry.rated ? 'Rating undone' : 'Moved to previous word');
   }
 
   function goNext() {
@@ -340,6 +342,7 @@
     if (mode === 'all') { browseGo(browseIndex + 1); return; }
     /* today mode: skip without rating; card returns later */
     if (!queue.length) { toast('This is the only card left — rate it to finish'); return; }
+    history.push({ card: current, mode: mode, queueSnapshot: queue.slice(), rated: false });
     queue.push(current);
     nextCardToday();
   }
