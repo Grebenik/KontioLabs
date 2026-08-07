@@ -52,7 +52,7 @@
         <div class="session-count" id="session-count" aria-live="polite"></div>
       </div>
 
-      <p class="session-howto">Read the question, then tap the card (or press Space) to reveal the answer — then rate how well you knew it. Ratings schedule the card's next review; skip or go back anytime with the toolbar below.</p>
+      <p class="session-howto">Read the question, then tap the card (or press Space) to reveal the answer — then rate how well you knew it. Pressing Next after the answer is shown rates it Good by default; pick Again, Hard, or Easy instead if that's not accurate. Ratings schedule the card's next review; skip or go back anytime with the toolbar below.</p>
 
       <!-- Mode switch -->
       <div class="mode-row" role="group" aria-label="Study mode">
@@ -222,7 +222,7 @@
     document.getElementById('nav-last-label').textContent  = today ? 'Day end' : 'Last';
     document.getElementById('nav-first').title = today ? 'Restart today’s session from the beginning (Home)' : 'Jump to the first card (Home)';
     document.getElementById('nav-back').title  = today ? 'Go to the previous word — undoes its rating if you just answered it (←)' : 'Go to the previous word (←)';
-    document.getElementById('nav-next').title  = today ? 'Go to the next word — this one returns later in the session (→)' : 'Go to the next word (→)';
+    document.getElementById('nav-next').title  = 'Go to the next word — rates this one Good if the answer is showing, otherwise skips it for now (→)';
     document.getElementById('nav-last').title  = today ? 'End today’s section and see the summary (End)' : 'Jump to the last card (End)';
   }
 
@@ -339,8 +339,11 @@
 
   function goNext() {
     if (!current) return;
+    /* answer already revealed: treat "Next" as an implicit Good rating,
+       unless they explicitly pick another level below */
+    if (flipped) { rate(3); return; }
     if (mode === 'all') { browseGo(browseIndex + 1); return; }
-    /* today mode: skip without rating; card returns later */
+    /* today mode, question side only: skip without rating; card returns later */
     if (!queue.length) { toast('This is the only card left — rate it to finish'); return; }
     history.push({ card: current, mode: mode, queueSnapshot: queue.slice(), rated: false });
     queue.push(current);
