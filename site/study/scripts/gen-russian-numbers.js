@@ -139,7 +139,7 @@ const header = `/* Topic: Russian Numbers — cardinal numbers 0-2,000,000 (with
    script instead. */
 SRS.registerTopic({
   id: "russian-numbers",
-  group: "Russian",
+  group: "Russian - English",
   name: "Russian Numbers",
   description: "Russian cardinal numbers 0 to 2,000,000, ordinals 1st-10th, and core counting vocabulary — for English-speaking learners of Russian.",
   cards: [

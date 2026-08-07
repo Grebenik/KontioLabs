@@ -9,7 +9,7 @@ SRS.registerTopic({
   id: "english-numbers",
   group: "English",
   name: "English Numbers",
-  description: "English cardinal numbers 0 to 2,000,000, ordinals 1st-10th, and core counting vocabulary — for Russian-speaking learners of English.",
+  description: "English cardinal numbers 0 to 2,000,000, ordinals 1st-10th, and core counting vocabulary — the numbers and text as written in English, useful for learners of any native language.",
   cards: [
     { id: "en-001", front: "0", back: "zero" },
     { id: "en-002", front: "1", back: "one" },

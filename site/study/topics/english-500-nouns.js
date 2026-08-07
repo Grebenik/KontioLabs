@@ -7,8 +7,8 @@
    edit the SECTIONS array there and re-run rather than hand-editing this file. */
 SRS.registerTopic({
   id: "english-500-nouns",
-  group: "English",
-  name: "English: 500 Nouns",
+  group: "Russian - English",
+  name: "English-Russian: 500 Nouns",
   description: "500 English nouns across household, nature, animals, professions, places, technology, science, food, and more — for Russian-speaking learners of English.",
   cards: [
     /* --- Household & furniture --- */
